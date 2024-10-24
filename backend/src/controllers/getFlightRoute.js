@@ -1,14 +1,51 @@
 const db = require('../db/config');
 const { APIflights } = require('../api/apiService');
 
-// esto es para el punto 3, decidi hacer un controlador aparte en vez de seguir con el del punto 2
 const getFlight3 = async (req, res) => {
-  const { Origin, Destination, maxFlights } = req.body; 
-  const maxConnections = maxFlights || 3; 
+  const { Origin, Destination, maxFlights } = req.body;
+  const maxConnections = maxFlights || 3;
 
   try {
-    const flightsData = await APIflights('basico');
+    const [existingJourney] = await db.query(
+      'SELECT * FROM Journey WHERE origin = ? AND destination = ?',
+      [Origin, Destination]
+    );
 
+    if (existingJourney.length > 0) {
+      const journeyId = existingJourney[0].id;
+      const [flights] = await db.query(
+        `SELECT f.origin, f.destination, f.price, t.FlightCarrier, t.FlightNumber 
+         FROM Flight f
+         JOIN Transport t ON f.transport_id = t.id
+         JOIN JourneyFlight jf ON jf.flight_id = f.id
+         WHERE jf.journey_id = ?`,
+        [journeyId]
+      );
+
+      const route = flights.map(flight => ({
+        Origin: flight.origin,
+        Destination: flight.destination,
+        Price: flight.price,
+        Transport: {
+          FlightCarrier: flight.FlightCarrier,
+          FlightNumber: flight.FlightNumber
+        }
+      }));
+
+      return res.json({
+        message: 'Ruta recuperada de la base de datos.',
+        Journey: {
+          Origin,
+          Destination,
+          Price: existingJourney[0].price,
+          Flights: route,
+          CreatedAt: existingJourney[0].created_at
+        }
+      });
+    }
+
+
+    const flightsData = await APIflights('basico');
     if (!Array.isArray(flightsData) || flightsData.length === 0) {
       return res.status(500).json({ message: 'Unexpected API response format or empty flights data' });
     }
@@ -18,10 +55,30 @@ const getFlight3 = async (req, res) => {
     let totalPrice = 0;
 
     for (let i = 0; i < maxConnections; i++) {
-      const nextFlight = flightsData.find(flight => flight.DepartureStation === currentOrigin);
+      const nextFlight = flightsData.find(flight => 
+        flight.DepartureStation === currentOrigin && flight.ArrivalStation !== Destination
+      );
 
       if (!nextFlight) {
-        return res.status(404).json({ message: `No flight found from ${currentOrigin}` });
+        const directFlight = flightsData.find(flight => 
+          flight.DepartureStation === currentOrigin && flight.ArrivalStation === Destination
+        );
+        
+        if (directFlight) {
+          route.push({
+            Origin: directFlight.DepartureStation,
+            Destination: directFlight.ArrivalStation,
+            Price: directFlight.Price,
+            Transport: {
+              FlightCarrier: directFlight.FlightCarrier,
+              FlightNumber: directFlight.FlightNumber
+            }
+          });
+          totalPrice += directFlight.Price;
+          break; 
+        } else {
+          return res.status(404).json({ message: `No flight found from ${currentOrigin}` });
+        }
       }
 
       route.push({
@@ -36,14 +93,10 @@ const getFlight3 = async (req, res) => {
 
       totalPrice += nextFlight.Price;
 
-      if (nextFlight.ArrivalStation === Destination) {
-        break;
-      }
+      currentOrigin = nextFlight.ArrivalStation; 
 
-      currentOrigin = nextFlight.ArrivalStation;
-
-      if (i === maxConnections - 1 && currentOrigin !== Destination) {
-        return res.status(400).json({ message: 'Maximum connections reached without finding destination' });
+      if (currentOrigin === Destination) {
+        break; 
       }
     }
 
@@ -73,17 +126,19 @@ const getFlight3 = async (req, res) => {
     }
 
     res.json({
+      message: 'Ruta creada y guardada en la base de datos.',
       Journey: {
         Origin,
         Destination,
         Price: totalPrice,
-        Flights: route
+        Flights: route,
+        CreatedAt: new Date().toISOString()
       }
     });
 
   } catch (error) {
-    console.error("Error calculating route", error.message);
-    res.status(500).json({ message: 'Error calculating route', error });
+    console.error("Error calculating or retrieving route", error.message);
+    res.status(500).json({ message: 'Error calculating or retrieving route', error });
   }
 };
 
