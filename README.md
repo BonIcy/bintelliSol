@@ -135,7 +135,7 @@ Para probar el controlador en Postman, sigue estos pasos:
      - `destination`: la ciudad de destino (ej. `CTG`).
      - `level`: (opcional) el nivel de detalle que puede ser `basico`, `intermedio` o `avanzado`. Si no se proporciona, se usará `basico` por defecto.
 
-   ![Ejemplo de Postman](./doc_assets/postman_example.png)
+   ![Ejemplo de psotman](./doc_assets/postmanEx.png)
 
 4. **Enviar la Solicitud**: Haz clic en el botón **Send** para enviar la solicitud.
 
