@@ -37,3 +37,13 @@ CREATE INDEX idx_journey_origin_destination ON Journey (origin, destination);
 CREATE INDEX idx_flight_origin_destination ON Flight (origin, destination);
 ALTER TABLE Journey 
 ADD created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
+
+DELETE FROM JourneyFlight;
+DELETE FROM Journey;
+DELETE FROM Flight;
+DELETE FROM Transport;
+
+SELECT * FROM Journey;
+SELECT * FROM JourneyFlight;
+SELECT * FROM Flight;
+SELECT * FROM Transport;
