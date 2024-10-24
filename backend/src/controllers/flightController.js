@@ -1,5 +1,5 @@
 const db = require('../db/config');
-const { getFlightsFromAPI } = require('../api/apiService');
+const { APIflights } = require('../api/apiService');
 
 // obtener ruta de un vuelo
 const getFlightRoute = async (req, res) => {
@@ -17,7 +17,7 @@ const getFlightRoute = async (req, res) => {
       return res.json({ message: 'Route already exists', route: existingJourney });
     }
 
-    const flightsData = await getFlightsFromAPI(level || 'basico');
+    const flightsData = await APIflights(level || 'basico');
     console.log('flightsData:', flightsData, 'Type:', typeof flightsData, 'Is Array:', Array.isArray(flightsData));
     
     if (Array.isArray(flightsData) && flightsData.length > 0) {

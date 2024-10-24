@@ -6,7 +6,7 @@ const apiUrls = {
   avanzado: "https://bitecingcom.ipage.com/testapi/avanzado.js",
 };
 
-const getFlightsFromAPI = async (level) => {
+const APIflights = async (level) => {
   try {
     const apiUrl = apiUrls[level] || apiUrls.basico;
     const response = await axios.get(apiUrl);
@@ -30,4 +30,4 @@ const getFlightsFromAPI = async (level) => {
   }
 };
 
-module.exports = { getFlightsFromAPI };
+module.exports = { APIflights };
