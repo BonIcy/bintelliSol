@@ -6,10 +6,10 @@ Este proyecto es una API construida para la empresa **BINTELLI**. Su objetivo es
 ![structure](./doc_assets/structure.png)
 
 ### Descripción de la Estructura
-
+### Backend
 - **src/**: Contiene el código fuente de la aplicación.
   - **api/**: Aquí se encuentran los servicios de API utilizados para obtener información de vuelos.
-  - **db/**: Contiene la configuración de la base de datos y el script SQL para crear las tablas.
+  - **db/**: Contiene la coneccion a la base de datos.
   - **controllers/**: Aquí se encuentran las funciones que manejan la lógica de negocio de las rutas de vuelo.
   - **routes/**: Define las rutas de la API y sus controladores correspondientes.
 
@@ -20,7 +20,7 @@ Este proyecto es una API construida para la empresa **BINTELLI**. Su objetivo es
 - **index.js**: Archivo principal que inicializa el servidor y establece las rutas.
 
 - **package.json** y **package-lock.json**: Archivos que gestionan las dependencias del proyecto.
-
+### db
 - **binteli.sql**: Script SQL para crear la base de datos y las tablas necesarias.
 
 ## Instalación
