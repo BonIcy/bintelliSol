@@ -14,7 +14,4 @@ router.get('/getFRoute', getFlightRoute);
 router.get('/getRoute3', getFlight3)
 
 
-
-
-
 module.exports = router;
