@@ -22,6 +22,7 @@ CREATE TABLE Journey (
     origin VARCHAR(255) NOT NULL,
     destination VARCHAR(255) NOT NULL,
     price DOUBLE NOT NULL
+
 );
 
 CREATE TABLE JourneyFlight (
@@ -31,3 +32,8 @@ CREATE TABLE JourneyFlight (
     FOREIGN KEY (journey_id) REFERENCES Journey(id),
     FOREIGN KEY (flight_id) REFERENCES Flight(id)
 );
+
+CREATE INDEX idx_journey_origin_destination ON Journey (origin, destination);
+CREATE INDEX idx_flight_origin_destination ON Flight (origin, destination);
+ALTER TABLE Journey 
+ADD created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
